@@ -20,13 +20,12 @@ __Este readme debe incluir, al menos, la siguiente información__:
 
 # Grupo
 
-Se trata de una práctica en grupo. Debeis dejar constancia de la/os
-integrantes del grupo en este README.
-
-Formato del listado:
-
-- Apellidos, Nombre (login udc)
-
+- Alonso García, Mar (mar.alonso)
+- Castro Rampersad, Sebastián Alfredo (s.castro.rampersad)
+- Castro Vilar, Adrián (adrian.castrov)
+- Fanjul Sánchez, Adolfo (a.fsanchez1)
+- Gayoso Salvado, David (david.gsalvado)
+- Rodríguez Estévez, Carla (carla.rodriguez1)
 
 # Breve presentación del proyecto
 
