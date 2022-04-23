@@ -1,37 +1,30 @@
-#Bases de datos para la gestión de usuarios de la app de mensajería
-#Esta solo lleva los usuarios no los mensajes
-#Funcionalidades que incluye la api:
-#
-# db -> bases de datos que contiene toda la info
-# key -> nombre del usuario en la bd
-# element -> lista de los mensajes al usuario esta lista se compone de pares:
-# {mensaje, leído} -> mensaje contiene el mensaje que recibirá cada usuario, leído es un booleano
 
-defmodule Db do
+defmodule DbMessages do
   use GenServer
+  @moduledoc """
+  Base de datos para xestionar o servizo de mensaxería e os buzóns de mensaxes de cada usuario.
+  Garda unha lista composta por pares {usuario,buzón}. O usuario é o nome do propietario do buzón, que é pola súa
+  parte é unha lista de pares {mensaxe,lido}. O primeiro é o texto do mensaxe e o segundo é un booleano que indica se
+  o mensaxe xa foi lido ou non
+  """
 
   #API con operacións
   defp new(),do: []
 
-  #Escribir un nuevo usuario en la bd
   defp write(db,key,element) do
     [{key, element} | db]
   end
 
-  #borrar un usuario de la bd
   defp delete(db,key),do: delete_key(db,key)
 
   defp delete_key([{key, _} | tail], key), do: tail
   defp delete_key([pair | tail], key), do: [pair | delete_key(tail, key)]
   defp delete_key([], _ ), do: []
 
-  #revisa que el usuario esté en la bd, si existe devuelve la contraseña del usuario
-  #si no existe devuelve not found y se puede registrar el nombre
   defp read([],_), do: {:not_found}
   defp read([{k,elem} | _],key) when k == key, do: {:ok,elem}
   defp read([_ | tail],key), do: read(tail,key)
 
-  #reiniciar BD
   defp destroy(_),do: []
 
   defp move_head(list) do
@@ -55,7 +48,6 @@ defmodule Db do
 
   defp delete_lidos(lista), do: delete_lidos_aux(lista,[])
 
-  #En esta función da igual darle la vuelta a la lista, total siguen estando todos los resultantes sin leer
   defp delete_lidos_aux([],listaux), do: listaux
   defp delete_lidos_aux([{_, true} | _],listaux), do: listaux
   defp delete_lidos_aux([h | t],listaux), do: delete_lidos_aux( t,[h | listaux])
@@ -64,7 +56,7 @@ defmodule Db do
 
   #Servidor
   defp start_link do
-    GenServer.start_link(__MODULE__,new() , name: :miBD) # start server
+    GenServer.start_link(__MODULE__,new() , name: :miBD)
   end
 
   @impl true
@@ -126,8 +118,11 @@ defmodule Db do
     buzon = read(state,usuario)
     case buzon do
       {:not_found} -> {:reply,:error_user_does_not_exist,state}
-      {:ok, mess} -> mensaxes = leer_todos_mensaxes(mess)
-                     {:reply,mensaxes,state}                                                             #aparecerán todos juntos y no habrá que recorrer toda la lista
+      {:ok, mess} ->  {newBuzon,_} = ler_mensaxes(mess)
+                      deleted = delete(state,usuario)
+                      newState = write(deleted,usuario,newBuzon)
+                      mensaxes = leer_todos_mensaxes(mess)
+                     {:reply,mensaxes,newState}                                                             #aparecerán todos juntos y no habrá que recorrer toda la lista
     end
 
   end
@@ -157,40 +152,72 @@ defmodule Db do
   end
 
   #Cliente
-  def iniciar_db() do
+
+  @doc """
+  Inicia a base de datos para comenzar a resolver as peticións
+  """
+  def init_db() do
     start_link()
   end
 
-  def engadir_usuario(usuario) do
-    GenServer.call(:miBD,{:engadir,usuario})
+  @doc """
+  Engade un usuario á base de datos devolve :user_not_valid se xa existe
+  na base de datos, sençon devolve :ok
+  """
+  def add_user(user) do
+    GenServer.call(:miBD,{:engadir,user})
   end
 
-  def quitar_usuario(usuario) do
-    GenServer.cast(:miBD,{:eliminar,usuario})
+  @doc """
+  Elimina un usuario da base de datos, se non existe non devolve ningún erro
+  """
+  def delete_user(user) do
+    GenServer.cast(:miBD,{:eliminar,user})
   end
 
-  def enviar_mensaxe(usuario, mensaxe) do     ##aquí o usuario é o destinatario do mensaxe
-    GenServer.call(:miBD,{:enviar,usuario,mensaxe})
+  @doc """
+  Envía o mensaxe indicado ó usuario que se lle pasa á función. Este mensaxe se engadirá ó buzón
+  do usuario e o marcará como non lido
+  """
+  def send_message(user, message) do
+    GenServer.call(:miBD,{:enviar,user,message})
   end
 
-  def obter_mensaxes_sen_leer(usuario) do
-    GenServer.call(:miBD,{:mensaxes_sen_ler,usuario})
+  @doc """
+  Obtén os mensaxes sen leer do buzón do usuario indicado e os marca como lidos no buzón.
+  Devolve unha lista coas mensaxes
+  """
+  def read_messages(user) do
+    GenServer.call(:miBD,{:mensaxes_sen_ler,user})
   end
 
-  def borrar_mensaxes_lidos(usuario) do
-    GenServer.call(:miBD,{:borrar_lidos,usuario})
+  @doc """
+  Borra os mensaxes xa lidos do usuario e deixa no seu buzón só os que están sen ler
+  """
+  def delete_read_message(user) do
+    GenServer.call(:miBD,{:borrar_lidos,user})
 
   end
 
-  def devolver_todos_os_mensaxes(usuario) do
-    GenServer.call(:miBD,{:todos_mensaxes,usuario})
+  @doc """
+  Obtén todas as mensaxes non borradas do buzón do usuario indicado e os marca como lidos no buzón.
+  Devolve unha lista coas mensaxes
+  """
+  def all_messages(user) do
+    GenServer.call(:miBD,{:todos_mensaxes,user})
   end
 
+  @doc """
+  Resetea a base de datos quitando todos os usuarios xa rexistrados e os seus buzóns
+  """
   def reset_db() do
     GenServer.cast(:miBD,{:reset})
   end
 
-  def disolver() do
+  @doc """
+  Para a base de datos e mata o proceso
+  """
+  def stop() do
     GenServer.stop(:miBD)
     :ok
   end
