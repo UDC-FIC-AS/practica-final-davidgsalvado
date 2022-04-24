@@ -98,6 +98,7 @@ defmodule DbUsers do
 
   #Cliente
 
+  @spec init_db() :: {:ok, pid}
   @doc """
   Inicia a base de datos para comenzar a resolver as peticións
   """
@@ -105,54 +106,132 @@ defmodule DbUsers do
     start_link()
   end
 
+  @spec check_user_exists(String.t()) :: :ok | :user_not_valid
   @doc """
   Revisa se na base de datos existe o usuario indicado como parámetro
-  devolver :ok se non existe e :user_not_valid se xa existe na base de datos
+  Devolve :ok se non existe e :user_not_valid se xa existe na base de datos
+
+  ## Parámetros
+
+    - user : String que identifica ó usuario
+
+  ## Exemplos
+      iex> DbUsers.init_db()
+      iex> DbUsers.add_user("pepito", "passw")
+      iex> DbUsers.check_user_exists("pepito")
+      :ok
+      iex> DbUsers.stop()
+      :ok
   """
   def check_user_exists(user) do
     GenServer.call(:miBD,{:buscar,user})
   end
 
+  @spec get_password(String.t()) :: String.t()
   @doc """
-  Obtén o contrasinal dun usuario dentro da base de datos
-  se non existe devolve :user_not_register
+  Obtén o contrasinal dun usuario dentro da base de datos.
+  Se non existe devolve :user_not_register
+
+  ## Parámetros
+
+    - user : String que identifica ó usuario
+
+  ## Exemplos
+      iex> DbUsers.init_db()
+      iex> DbUsers.get_password("pepito")
+      :user_not_register
+      iex> DbUsers.stop()
+      :ok
   """
   def get_password(user) do
     GenServer.call(:miBD,{:contrasinal,user})
   end
 
+  @spec add_user(String.t(), String.t()) :: :ok | :user_not_valid
   @doc """
-  Engade un usuario á base de datos xunto coa contrasinal que terá asociada
-  devolve :user_not_valid se xa existe na base de datos, sençon devolve :ok
+  Engade un usuario á base de datos xunto coa contrasinal que terá asociada.
+  Devolve :user_not_valid se xa existe na base de datos, senón devolve :ok
+
+  ## Parámetros
+
+    - user : Usuario a añadir
+    - passw : Contraseña asociada
+
+  ## Exemplos
+      iex> DbUsers.init_db()
+      iex> DbUsers.add_user("pepito", "password")
+      :ok
+      iex> DbUsers.stop()
+      :ok
   """
   def add_user(user,passw) do
     GenServer.call(:miBD,{:engadir,user,passw})
   end
 
+  @spec delete_user(String.t()) :: :ok
   @doc """
-  Elimina un usuario da base de datos, se non existe non devolve ningún erro
+  Elimina un usuario da base de datos. Se non existe non devolve ningún erro
+
+  ## Parámetros
+
+    - user : Usuario que se quere eliminar
+
+  ## Exemplos
+      iex> DbUsers.init_db()
+      iex> DbUsers.add_user("pepito", "password")
+      iex> DbUsers.delete_user("pepito")
+      :ok
+      iex> DbUsers.stop()
+      :ok
   """
   def delete_user(user) do
     GenServer.cast(:miBD,{:eliminar,user})
   end
 
+  @spec get_users() :: term()
   @doc """
   Obtén a lista de usuarios rexistrados na base de datos devolvendo unha lista cos nomes.
   Se non hai usuarios rexistrados, devolve lista vacía, en ningún caso devolve erro
+
+  ## Exemplos
+      iex> DbUsers.init_db()
+      iex> DbUsers.add_user("pepito", "password")
+      iex> DbUsers.add_user("pepe", "passw")
+      iex> DbUsers.get_users()
+      ["pepe", "pepito"]
+      iex> DbUsers.stop()
+      :ok
   """
   def get_users() do
     GenServer.call(:miBD,{:listar})
   end
 
+  @spec reset_db() :: :ok
   @doc """
   Resetea a base de datos quitando todos os usuarios xa rexistrados
+
+  ## Exemplos
+      iex> DbUsers.init_db()
+      iex> DbUsers.add_user("pepito", "passw")
+      iex> DbUsers.reset_db()
+      :ok
+      iex> DbUsers.get_users()
+      []
+      iex> DbUsers.stop()
+      :ok
   """
   def reset_db() do
     GenServer.cast(:miBD,{:reset})
   end
 
+  @spec stop() :: :ok
   @doc """
   Para a base de datos e mata o proceso
+
+  ## Exemplos
+      iex> DbUsers.init_db()
+      iex> DbUsers.stop()
+      :ok
   """
   def stop() do
     GenServer.stop(:miBD)

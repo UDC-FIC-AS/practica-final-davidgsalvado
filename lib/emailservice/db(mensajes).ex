@@ -153,6 +153,7 @@ defmodule DbMessages do
 
   #Cliente
 
+  @spec init_db() :: {:ok, pid}
   @doc """
   Inicia a base de datos para comenzar a resolver as peticións
   """
@@ -160,48 +161,130 @@ defmodule DbMessages do
     start_link()
   end
 
+  @spec add_user(String.t()) :: :ok | :user_not_valid
   @doc """
-  Engade un usuario á base de datos devolve :user_not_valid se xa existe
-  na base de datos, sençon devolve :ok
+  Engade un usuario á base de datos. Devolve :user_not_valid se xa existe
+  na base de datos, senón devolve :ok
+
+  ## Parámetros
+
+    - user : Usuario a añadir
+
+  ## Exemplos
+      iex> DbMessages.init_db()
+      iex> DbMessages.add_user("pepito")
+      :ok
+      iex> DbMessages.stop()
+      :ok
   """
   def add_user(user) do
     GenServer.call(:miBD,{:engadir,user})
   end
 
+  @spec delete_user(String.t()) :: :ok
   @doc """
-  Elimina un usuario da base de datos, se non existe non devolve ningún erro
+  Elimina un usuario da base de datos. Se non existe non devolve ningún erro
+
+  ## Parámetros
+
+    - user : Usuario que se quere eliminar
+
+  ## Exemplos
+      iex> DbMessages.init_db()
+      iex> DbMessages.add_user("pepito")
+      iex> DbMessages.delete_user("pepito")
+      :ok
+      iex> DbMessages.stop()
+      :ok
   """
   def delete_user(user) do
     GenServer.cast(:miBD,{:eliminar,user})
   end
 
+  @spec send_message(String.t(), String.t()) :: :ok
   @doc """
   Envía o mensaxe indicado ó usuario que se lle pasa á función. Este mensaxe se engadirá ó buzón
   do usuario e o marcará como non lido
+
+  ## Parámetros
+
+    - user : Usuario que recibirá a mensaxe
+    - message : Contido da mensaxe
+
+  ## Exemplos
+      iex> DbMessages.init_db()
+      iex> DbMessages.add_user("pepito")
+      iex> DbMessages.send_message("pepito", "Hola!")
+      :ok
+      iex> DbMessages.stop()
+      :ok
   """
   def send_message(user, message) do
     GenServer.call(:miBD,{:enviar,user,message})
   end
 
+  @spec read_messages(String.t()) :: term()
   @doc """
   Obtén os mensaxes sen leer do buzón do usuario indicado e os marca como lidos no buzón.
   Devolve unha lista coas mensaxes
+
+  ## Parámetros
+
+    - user : Usuario do que se quere ler o buzón
+
+  ## Exemplos
+      iex> DbMessages.init_db()
+      iex> DbMessages.add_user("pepito")
+      iex> DbMessages.send_message("pepito", "Hola")
+      iex> DbMessages.read_messages("pepito")
+      ["Hola"]
+      iex> DbMessages.stop()
+      :ok
   """
   def read_messages(user) do
     GenServer.call(:miBD,{:mensaxes_sen_ler,user})
   end
 
+  @spec delete_read_message(String.t()) :: :ok
   @doc """
   Borra os mensaxes xa lidos do usuario e deixa no seu buzón só os que están sen ler
+
+  ## Parámetros
+
+    - user : Usuario do que se desexa borrar os mensaxes xa lidos
+
+  ## Exemplos
+      iex> DbMessages.init_db()
+      iex> DbMessages.add_user("pepito")
+      iex> DbMessages.send_message("pepito", "Hola")
+      iex> DbMessages.read_messages("pepito")
+      iex> DbMessages.delete_read_message("pepito")
+      :ok
+      iex> DbMessages.stop()
+      :ok
   """
   def delete_read_message(user) do
     GenServer.call(:miBD,{:borrar_lidos,user})
 
   end
 
+  @spec all_messages(String.t()) :: term()
   @doc """
   Obtén todas as mensaxes non borradas do buzón do usuario indicado e os marca como lidos no buzón.
   Devolve unha lista coas mensaxes
+
+  ## Parámetros
+
+    - user : Usuario do que se quere ler o buzón
+
+  ## Exemplos
+      iex> DbMessages.init_db()
+      iex> DbMessages.add_user("pepito")
+      iex> DbMessages.send_message("pepito", "Hola")
+      iex> DbMessages.all_messages("pepito")
+      ["Hola"]
+      iex> DbMessages.stop()
+      :ok
   """
   def all_messages(user) do
     GenServer.call(:miBD,{:todos_mensaxes,user})
@@ -209,6 +292,14 @@ defmodule DbMessages do
 
   @doc """
   Resetea a base de datos quitando todos os usuarios xa rexistrados e os seus buzóns
+
+  ## Exemplos
+      iex> DbMessages.init_db()
+      iex> DbMessages.add_user("pepito")
+      iex> DbMessages.reset_db()
+      :ok
+      iex> DbMessages.stop()
+      :ok
   """
   def reset_db() do
     GenServer.cast(:miBD,{:reset})
@@ -216,6 +307,11 @@ defmodule DbMessages do
 
   @doc """
   Para a base de datos e mata o proceso
+
+  ## Exemplos
+      iex> DbUsers.init_db()
+      iex> DbUsers.stop()
+      :ok
   """
   def stop() do
     GenServer.stop(:miBD)
