@@ -1,0 +1,30 @@
+@startuml Contenedor
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+Person_Ext(personAlias, "Cliente", "Quiere hacer uso del sistema de mensajes")
+
+Container_Boundary(servidor, "Servidor") {
+    Component(directorio, "Directorio", "Es el directorio encargado de publicar el API a los clientes y redirigir las peticiones a los servicios correspondientes")
+}
+
+Container_Boundary(servidor1, "Servidor de mensajes") {
+    Component(mensajes, "Servicio de mensajes", "Recibe peticiones relacionadas con la gestión de mensajes de la app, las procesa y devuelve una respuesta")
+}
+
+Container_Boundary(servidor2, "Servidor de usuarios") {
+    Component(usuarios, "Servicio de usuarios", "Recibe peticiones relacionadas con la gestión de usuarios de la app, las procesa y devuelve una respuesta")
+}
+
+
+
+
+
+Rel(personAlias, directorio, "Envía", "Petición")
+Rel(directorio, personAlias, "Devuelve", "Respuesta")
+
+Rel(mensajes, directorio, "Responde", "Resultado")
+Rel(directorio, mensajes, "Redirige", "Petición")
+
+Rel(usuarios, directorio, "Responde", "Resultado")
+Rel(directorio, usuarios, "Redirige", "Petición")
+@enduml

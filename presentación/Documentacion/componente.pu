@@ -1,0 +1,51 @@
+@startuml Component
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+Person_Ext(personAlias, "Cliente", "Quiere hacer uso del sistema de mensajes")
+
+Container_Boundary(servidor, "Servidor") {
+    Component(directorio, "Directorio", "Es el directorio encargado de publicar el API a los clientes y redirigir las peticiones a los servicios correspondientes")
+    Component(nodo, "Node manager", "Se encarga de la gestión de los nodos servidores y guarda información sobre ellos")
+   
+       
+}
+
+Container_Boundary(servidor1, "Servidor de mensajes") {
+    Component(mensajes, "Servicio de mensajes", "Recibe peticiones relacionadas con la gestión de mensajes de la app, las procesa y devuelve una respuesta")
+    ComponentDb(message_db, "Base de datos", "Se encarga de mantener la persistencia de los datos sobre mensajes")
+
+}
+
+Container_Boundary(servidor2, "Servidor de usuarios") {
+    Component(usuarios, "Servicio de usuarios", "Recibe peticiones relacionadas con la gestión de usuarios de la app, las procesa y devuelve una respuesta")
+    ComponentDb(user_db, "Base de datos", "Se encarga de mantener la persistencia de los datos sobre usuarios")
+
+}
+
+
+
+
+
+
+
+
+
+Rel(personAlias, directorio, "Envía", "Petición")
+Rel(directorio, personAlias, "Devuelve", "Respuesta")
+
+Rel(mensajes, directorio, "Responde", "Resultado")
+Rel(directorio, mensajes, "Redirige", "Petición")
+
+Rel(usuarios, directorio, "Responde", "Resultado")
+Rel(directorio, usuarios, "Redirige", "Petición")
+
+Rel(directorio, nodo, "Envía", "Petición")
+Rel(nodo, directorio, "Responde", "Respuesta")
+
+
+Rel(mensajes, message_db, "Envía", "Petición")
+Rel(message_db, mensajes, "Devuelve", "Respuesta")
+
+Rel(usuarios, user_db, "Envía", "Petición")
+Rel(user_db, usuarios, "Devuelve", "Respuesta")
+@enduml

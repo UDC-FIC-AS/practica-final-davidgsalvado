@@ -1,0 +1,10 @@
+@startuml Contexto
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+Person_Ext(personAlias, "Cliente", "Quiere hacer uso del sistema de mensajes")
+
+System(systemAlias, "Sistema clienteservidor distribuido de mensajes", "Recibe peticiones de los clientes, las procesa y devuelve una respuesta")
+
+Rel(personAlias, systemAlias, "Envía", "Petición")
+Rel(systemAlias, personAlias, "Devuelve", "Respuesta")
+@enduml
