@@ -24,7 +24,7 @@ defmodule MessageService do
 
     case resp_read do
       {:error, :not_found} ->
-        send(dir_rec_pid, {:error, :user_does_not_exist})
+        send(dir_rec_pid, {:error, {:send_message, :user_does_not_exist}})
       {:ok, message_list} ->
         new_message_list = [{sender, {message, false}} | message_list]
         ServerDb.overwrite({:global, :message_db}, recipient, new_message_list)
@@ -38,7 +38,7 @@ defmodule MessageService do
 
     case resp_read do
       {:error, :not_found} ->
-        send(dir_rec_pid, {:error, :user_does_not_exist})
+        send(dir_rec_pid, {:error, {:read_unseen, :user_does_not_exist}})
       {:ok, message_list} ->
         {marked_m_l, unseen_m_l, _} = mark_and_get(message_list, [], [], [])
         ServerDb.overwrite({:global, :message_db}, username, marked_m_l)
@@ -52,7 +52,7 @@ defmodule MessageService do
 
     case resp_read do
       {:error, :not_found} ->
-        send(dir_rec_pid, {:error, :user_does_not_exist})
+        send(dir_rec_pid, {:error, {:read_all, :user_does_not_exist}})
       {:ok, message_list} ->
         {marked_m_l, _, all_m_l} = mark_and_get(message_list, [], [], [])
         ServerDb.overwrite({:global, :message_db}, username, marked_m_l)
@@ -66,7 +66,7 @@ defmodule MessageService do
 
     case resp_read do
       {:error, :not_found} ->
-        send(dir_rec_pid, {:error, :user_does_not_exist})
+        send(dir_rec_pid, {:error, {:delete_seen, :user_does_not_exist}})
       {:ok, message_list} ->
         unseen_db_m_l = delete_seen(message_list, [])
         ServerDb.overwrite({:global, :message_db}, username, unseen_db_m_l)
