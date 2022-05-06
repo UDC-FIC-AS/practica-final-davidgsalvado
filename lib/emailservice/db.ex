@@ -23,6 +23,12 @@ defmodule Db do
     aux_delete(t, key, [{k, v} | new_db_ref], false)
   end
 
+  #overwrite
+  def overwrite(db_ref, key, element) do
+    new_db_ref = delete(db_ref, key)
+    write(new_db_ref, key, element)
+  end
+
   #read
   def read([], _), do: {:error, :not_found}
 
@@ -45,6 +51,6 @@ defmodule Db do
 
   def destroy(_) do
     :ok
-  end  
+  end
 
 end
