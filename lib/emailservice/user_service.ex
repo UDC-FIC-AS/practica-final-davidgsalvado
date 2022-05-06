@@ -55,7 +55,7 @@ defmodule UserService do
   def execute_action({:list_users, _}, dir_rec_pid) do
     resp = ServerDb.get_all_content({:global, :user_db})
     name_list = filter_names(resp, [])
-    send(dir_rec_pid, {:ok, name_list})
+    send(dir_rec_pid, {:ok, {:list_users, name_list}})
   end
 
   defp filter_names([], name_list), do: name_list
