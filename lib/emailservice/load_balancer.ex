@@ -12,6 +12,13 @@ defmodule LoadBalancer do
     NodeManager.remove(sv_type, sv_node)
   end
 
+  def receive_request(dir_rec_pid) do
+    receive do
+      {lb_type, {action, args}} ->
+        process_action(lb_type, {action, args}, dir_rec_pid)
+      end
+  end
+
   def process_action(sv_type, {action, args}, dir_rec_pid) do
     try do
       sv_node = NodeManager.get(sv_type)
@@ -28,14 +35,6 @@ defmodule LoadBalancer do
       _ ->
       send(dir_rec_pid, {:error, :service_connection_error})
     end
-  end
-
-
-  def receive_request(dir_rec_pid) do
-    receive do
-      {lb_type, {action, args}} ->
-        process_action(lb_type, {action, args}, dir_rec_pid)
-      end
   end
 
 end

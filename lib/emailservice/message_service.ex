@@ -1,11 +1,20 @@
 defmodule MessageService do
+
+  def init_user_service do
+    NodeManager.init(:message_db)
+  end
+
+  def add_db(db_node) do
+    NodeManager.add(:message_db, db_node)
+  end
+
   def receive_request(dir_rec_pid) do
     receive do
       {action, args} -> execute_action({action, args}, dir_rec_pid)
     end
   end
 
-  def execute_action({:send_message, args}, dir_rec_pid) do
+  def execute_action({:send_message, {{sender, recipient}, message}}, dir_rec_pid) do
     #TODO implement actions
     send(dir_rec_pid, {:ok, "send_message"})
   end

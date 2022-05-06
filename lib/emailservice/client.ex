@@ -18,7 +18,7 @@ defmodule Client do
 
   def receive_response() do
     receive do
-      {:ok, resp} -> IO.puts "#{resp}"
+      {:ok, resp} -> IO.inspect resp
       {:error, error} -> IO.puts "#{error}"
     end
   end
