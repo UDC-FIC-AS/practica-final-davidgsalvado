@@ -15,6 +15,7 @@ defmodule MessageService do
           execute_action({action, args}, dir_rec_pid)
         rescue
           _ -> send(dir_rec_pid, {:error, :db_connection_error})
+        end
     end
   end
 
