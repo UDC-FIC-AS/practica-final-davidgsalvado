@@ -31,7 +31,7 @@ defmodule UserService do
       {:error, :not_found} ->
         ServerDb.write({:global, :user_db}, username, password)
         ServerDb.write({:global, :message_db}, username, [])
-        send(dir_rec_pid, {:ok, :registered_succesfully})
+        send(dir_rec_pid, {:ok, {:register, :registered_succesfully}})
 
       _ -> send(dir_rec_pid, {:error, :user_already_registered})
     end
@@ -45,7 +45,7 @@ defmodule UserService do
         send(dir_rec_pid, {:error, :user_does_not_exist})
       {:ok, pass} ->
         if password == pass do
-          send(dir_rec_pid, {:ok, :correct_password})
+          send(dir_rec_pid, {:ok, {:login, :correct_password}})
         else
           send(dir_rec_pid, {:error, :wrong_password})
         end

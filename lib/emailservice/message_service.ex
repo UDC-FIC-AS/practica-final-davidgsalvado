@@ -28,7 +28,7 @@ defmodule MessageService do
       {:ok, message_list} ->
         new_message_list = [{sender, {message, false}} | message_list]
         ServerDb.overwrite({:global, :message_db}, recipient, new_message_list)
-        send(dir_rec_pid, {:ok, :messsage_sent_succesfully})
+        send(dir_rec_pid, {:ok, {:send_message, :messsage_sent_succesfully}})
     end
 
   end
@@ -42,7 +42,7 @@ defmodule MessageService do
       {:ok, message_list} ->
         {marked_m_l, unseen_m_l, _} = mark_and_get(message_list, [], [], [])
         ServerDb.overwrite({:global, :message_db}, username, marked_m_l)
-        send(dir_rec_pid, {:ok, unseen_m_l})
+        send(dir_rec_pid, {:ok, {:read_unseen, unseen_m_l}})
     end
 
   end
@@ -56,7 +56,7 @@ defmodule MessageService do
       {:ok, message_list} ->
         {marked_m_l, _, all_m_l} = mark_and_get(message_list, [], [], [])
         ServerDb.overwrite({:global, :message_db}, username, marked_m_l)
-        send(dir_rec_pid, {:ok, all_m_l})
+        send(dir_rec_pid, {:ok, {:read_all, all_m_l}})
     end
 
   end
@@ -70,7 +70,7 @@ defmodule MessageService do
       {:ok, message_list} ->
         unseen_db_m_l = delete_seen(message_list, [])
         ServerDb.overwrite({:global, :message_db}, username, unseen_db_m_l)
-        send(dir_rec_pid, {:ok, :deleted_succesfully})
+        send(dir_rec_pid, {:ok, {:delete_seen, :deleted_succesfully}})
     end
 
   end
