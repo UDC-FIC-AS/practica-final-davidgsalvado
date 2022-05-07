@@ -8,11 +8,13 @@ defmodule Client do
   def send_request(dir_node, request, true) do
     rec_pid = spawn(fn -> Ui.receive_response(dir_node) end)
     send_request_aux(dir_node, request, rec_pid)
+    :ok
   end
 
   def send_request(dir_node, request, false) do
     rec_pid = spawn(fn -> receive_response() end)
     send_request_aux(dir_node, request, rec_pid)
+    :ok
   end
 
   def send_request_aux(dir_node, request, rec_pid) do
