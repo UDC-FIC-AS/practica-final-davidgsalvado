@@ -32,5 +32,3 @@ defmodule Client do
   end
 
 end
-
-end
