@@ -5,13 +5,21 @@ defmodule Client do
     else {:error, :connection_error} end
   end
 
-  def send_request(dir_node, request) do
-    client_rec_pid = spawn(fn -> receive_response() end)
+  def send_request(dir_node, request, true) do
+    rec_pid = spawn(fn -> Ui.receive_response(dir_node) end)
+    send_request_aux(dir_node, request, rec_pid)
+  end
 
+  def send_request(dir_node, request, false) do
+    rec_pid = spawn(fn -> receive_response() end)
+    send_request_aux(dir_node, request, rec_pid)
+  end
+
+  def send_request_aux(dir_node, request, rec_pid) do
     dir_pid = Node.spawn_link(dir_node,
-    fn ->
-      Directory.receive_request(client_rec_pid)
-    end)
+      fn ->
+        Directory.receive_request(rec_pid)
+      end)
 
     send(dir_pid, request)
   end
@@ -19,8 +27,10 @@ defmodule Client do
   def receive_response() do
     receive do
       {:ok, resp} -> IO.inspect resp
-      {:error, error} -> IO.inspect error
+      {:error, error} -> IO.puts "#{error}"
     end
   end
+
+end
 
 end
