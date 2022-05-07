@@ -12,15 +12,26 @@ Container_Boundary(servidor, "Servidor") {
 
 Container_Boundary(servidor1, "Servidor de mensajes") {
     Component(mensajes, "Servicio de mensajes", "Recibe peticiones relacionadas con la gestión de mensajes de la app, las procesa y devuelve una respuesta")
-    ComponentDb(message_db, "Base de datos", "Se encarga de mantener la persistencia de los datos sobre mensajes")
+   
 
 }
 
 Container_Boundary(servidor2, "Servidor de usuarios") {
     Component(usuarios, "Servicio de usuarios", "Recibe peticiones relacionadas con la gestión de usuarios de la app, las procesa y devuelve una respuesta")
+    
+}
+
+Container_Boundary(bd1, "Base de datos de usuarios") {
     ComponentDb(user_db, "Base de datos", "Se encarga de mantener la persistencia de los datos sobre usuarios")
 
+
 }
+
+Container_Boundary(bd2, "Base de datos de mensajes") {
+     ComponentDb(message_db, "Base de datos", "Se encarga de mantener la persistencia de los datos sobre mensajes")
+
+}
+
 
 
 
