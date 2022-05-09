@@ -1,11 +1,12 @@
-@startuml Diagrama4
+@startuml
 !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
 
 Person_Ext(personAlias, "Cliente", "Quiere hacer uso del sistema de mensajes")
 
 Container_Boundary(servidor, "Servidor") {
     Component(directorio, "Directorio", "Es el directorio encargado de publicar el API a los clientes y redirigir las peticiones a los servicios correspondientes")
-    Component(nodo, "Node manager", "Se encarga de la gestión de los nodos servidores y guarda información sobre ellos")
+    Component(nodo1, "Node manager mensajes", "Se encarga de la gestión de los nodos de los balanceadores de carga y guarda información sobre ellos")
+    Component(nodo2, "Node manager usuarios", "Se encarga de la gestión de los nodos de los balanceadores de carga y guarda información sobre ellos")
    
        
 }
@@ -39,12 +40,12 @@ Container_Boundary(servidor2, "Servidor de usuarios") {
 Container_Boundary(balanceador1, "Balanceador de carga") {
  Component(bal1, "Balanceador de carga de usuarios", "Se encarga de distribuír las peticiones a los diferentes servidores")
 
+
 }
 
 
 Container_Boundary(balanceador2, "Balanceador de carga") {
  Component(bal2, "Balanceador de carga de mensajes", "Se encarga de distribuír las peticiones a los diferentes servidores")
-
 } 
 
 
@@ -64,36 +65,18 @@ Rel(bal2, directorio, "Responde", "Resultado")
 Rel(directorio, bal2, "Redirige", "Petición")
 
 
-Rel(nodo, bal1, "Responde", "Resultado")
-
-Rel(bal2, nodo, "Envia", "Petición")
-
-Rel(nodo, bal2, "Responde", "Resultado")
-
-
-Rel(bal1, nodo, "Envia", "Petición")
-
-
-
 
 Rel(bal1, directorio, "Responde", "Resultado")
 Rel(directorio, bal1, "Redirige", "Petición")
 
-Rel(directorio, nodo, "Envía", "Petición")s
-Rel(nodo, directorio, "Responde", "Respuesta")
+Rel(directorio, nodo1, "Envía", "Petición")
+Rel(nodo1, directorio, "Responde", "Respuesta")
+
+Rel(directorio, nodo2, "Envía", "Petición")
+Rel(nodo2, directorio, "Responde", "Respuesta")
 
 
-Rel(mensajes, api1, "Envía", "Petición")
-Rel(api1, mensajes, "Devuelve", "Respuesta")
 
-Rel(usuarios, api2, "Envía", "Petición")
-Rel(api2, usuarios, "Devuelve", "Respuesta")
-
-Rel(api1, persistencia1, "Redirige", "Petición")
-Rel(persistencia1, api1, "Devuelve", "Resultado")
-
-Rel(api2, persistencia2, "Redirige", "Petición")
-Rel(persistencia2, api2, "Devuelve", "Resultado")
 
 
 
@@ -102,4 +85,16 @@ Rel(usuarios, bal1, "Redirige", "Petición")
 
 Rel(bal2, mensajes, "Responde", "Resultado")
 Rel(mensajes, bal2, "Redirige", "Petición")
+
+Rel(mensajes, api1, "Envía", "Petición")
+Rel(api1, mensajes, "Responde", "Respuesta")
+
+Rel(usuarios, api2, "Envía", "Petición")
+Rel(api2, usuarios, "Responde", "Respuesta")
+
+Rel(api1, persistencia1, "Envía", "Petición")
+Rel(persistencia1, api1, "Responde", "Respuesta")
+
+Rel(api2, persistencia2, "Envía", "Petición")
+Rel(persistencia2, api2, "Responde", "Respuesta")
 @enduml
