@@ -19,7 +19,7 @@ defmodule MessageService do
     end
   end
 
-  def execute_action({:send_message, {{sender, recipient}, message}}, dir_rec_pid) do
+  defp execute_action({:send_message, {{sender, recipient}, message}}, dir_rec_pid) do
     resp_read = ServerDb.read({:global, :message_db}, recipient)
 
     case resp_read do
@@ -33,7 +33,7 @@ defmodule MessageService do
 
   end
 
-  def execute_action({:read_unseen, username}, dir_rec_pid) do
+  defp execute_action({:read_unseen, username}, dir_rec_pid) do
     resp_read = ServerDb.read({:global, :message_db}, username)
 
     case resp_read do
@@ -47,7 +47,7 @@ defmodule MessageService do
 
   end
 
-  def execute_action({:read_all, username}, dir_rec_pid) do
+  defp execute_action({:read_all, username}, dir_rec_pid) do
     resp_read = ServerDb.read({:global, :message_db}, username)
 
     case resp_read do
@@ -61,7 +61,7 @@ defmodule MessageService do
 
   end
 
-  def execute_action({:delete_seen, username}, dir_rec_pid) do
+  defp execute_action({:delete_seen, username}, dir_rec_pid) do
     resp_read = ServerDb.read({:global, :message_db}, username)
 
     case resp_read do

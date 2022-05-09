@@ -24,7 +24,7 @@ defmodule UserService do
     end
   end
 
-  def execute_action({:register, {username, password}}, dir_rec_pid) do
+  defp execute_action({:register, {username, password}}, dir_rec_pid) do
     resp = ServerDb.read({:global, :user_db}, username)
 
     case resp do
@@ -37,7 +37,7 @@ defmodule UserService do
     end
   end
 
-  def execute_action({:login, {username, password}}, dir_rec_pid) do
+  defp execute_action({:login, {username, password}}, dir_rec_pid) do
     resp = ServerDb.read({:global, :user_db}, username)
 
     case resp do
@@ -52,7 +52,7 @@ defmodule UserService do
     end
   end
 
-  def execute_action({:list_users, _}, dir_rec_pid) do
+  defp execute_action({:list_users, _}, dir_rec_pid) do
     resp = ServerDb.get_all_content({:global, :user_db})
     name_list = filter_names(resp, [])
     send(dir_rec_pid, {:ok, {:list_users, name_list}})

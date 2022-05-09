@@ -24,7 +24,7 @@ defmodule Directory do
     end
   end
 
-  def distribute(client_rec_pid, {lb_type, action}) do
+  defp distribute(client_rec_pid, {lb_type, action}) do
     lb_node = NodeManager.get(lb_type)
 
     dir_rec_pid = spawn(fn -> receive_response(client_rec_pid) end)
@@ -37,7 +37,7 @@ defmodule Directory do
     send(lb_rec_pid, {lb_type, action})
   end
 
-  def receive_response(client_rec_pid) do
+  defp receive_response(client_rec_pid) do
     receive do
       {status, content} ->
         send(client_rec_pid, {status, content})
