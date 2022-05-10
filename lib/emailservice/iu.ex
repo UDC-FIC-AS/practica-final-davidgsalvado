@@ -10,7 +10,7 @@ defmodule Ui do
       {:ok, dir_node} ->
         Agent.start_link(fn -> "" end, name: :username, timeout: :infinity)
         prompt_1(dir_node)
-      {:error, :connection_error} -> Prompt.display("conextion error : try again later")
+      {:error, :connection_error} -> Prompt.display("connection error : try again later")
     end
   end
 
@@ -46,7 +46,7 @@ defmodule Ui do
   end
 
   defp print_help_aux() do
-    Prompt.display("register [username] [password]\nlogin [usernnme] [password]\nlogout\nlist_users\nsend [username] [message]\nnew_messages\nall_messages\ndelete_read_messages\n")
+    Prompt.display("register [username] [password]\nlogin [username] [password]\nexit\nlist_users\nsend [username] [message]\nnew_messages\nall_messages\ndelete_read_messages\n")
   end
 
   defp print_help(dir_node, type) do
@@ -60,6 +60,7 @@ defmodule Ui do
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   defp prompt_1(dir_node) do
+    Process.sleep(50)
     cmd = Prompt.text(">")
     splitted_cmd = String.split(cmd, " ", trim: true)
     if Enum.count(splitted_cmd) == 0 do
@@ -122,8 +123,8 @@ defmodule Ui do
           send_req_mess(dir_node, {:read_all, user})
         "delete_read_messages" ->
           send_req_mess(dir_node, {:delete_seen, user})
-        "logout" ->
-          Process.exit(self(), :normal)
+        "exit" ->
+          Process.exit(self(), :kill)
         "help" -> print_help(dir_node, 2)
         _ ->
           Prompt.display("invalid command")
@@ -166,9 +167,9 @@ defmodule Ui do
         Prompt.table([["From:", "Message:"] | Enum.map(all_m_l, fn e -> tuple_to_list(e) end)], header: true)
         prompt_2(dir_node)
       {:ok, {:delete_seen, :deleted_succesfully}} ->
-        display_aux(dir_node, "Readed messages deleted successfully", 2)
+        display_aux(dir_node, "Read messages deleted successfully", 2)
       {:error, _} ->
-        display_aux(dir_node, "conextion error : try again later", 2)
+        display_aux(dir_node, "connection error : try again later", 1)
     end
   end
 
