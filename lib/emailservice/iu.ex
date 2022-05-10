@@ -85,6 +85,8 @@ defmodule Ui do
             Prompt.display("incorrect format : login [username] [password]")
             prompt_1(dir_node)
           end
+        "exit" ->
+          Process.exit(self(), :kill)
         "help" ->
           print_help(dir_node, 1)
         _ ->
@@ -153,7 +155,7 @@ defmodule Ui do
         display_aux(dir_node, "recipient does not exist", 2)
         prompt_2(dir_node)
       {:ok, {:send_message, :messsage_sent_succesfully}} ->
-        display_aux(dir_node, "messsage sent succesfully", 2)
+        display_aux(dir_node, "message sent successfully", 2)
         prompt_2(dir_node)
       {:ok, {:read_unseen, unseen_m_l}} ->
         Process.sleep(500)

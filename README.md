@@ -1,23 +1,3 @@
-# template-practica-final
-
-La práctica final consite en la propuesta, diseño, implementación y
-presentación de un sistema propuesto por vosotros. El sistema debe
-presentar alguna de las arquitecturas distribuidas vistas durante el
-cuatrimestre, o una combinación de las mismas.
-
-Para justificar la propuesta (especificación del sistema), ésta debe
-incluir la descripción de los requisitos no funcionales. La propuesta
-debe ser validad por el profesorado de la asignatura. Como parte del
-proceso de validación, se establecerá uno de los tres requisitos no
-funcionales (rendimiento, disponibilidad, seguridad) para la
-aplicación de tácticas.
-
-El proyecto incluye una checklist que os sirve tanto para guiar el
-desarrollo, como para una autoevaluación del mismo.
-
-__Este readme debe incluir, al menos, la siguiente información__:
-
-
 # Grupo
 
 - Alonso García, Mar (mar.alonso)
@@ -35,4 +15,68 @@ aspecto destacable como presentación del proyecto.
 
 # Install
 
-Instrucciones para instalar, desplegar y ejecutar la aplicación.
+Primero se tendrá que editar el fichero **config.ex** en **lib/emailservice**, sustituyendo todos los *** por
+la ip correspondiente.
+
+Se ejecuta  ``` ./script.sh [your IP] ``` desde **practica-final-davidgsalvado**.
+Este script generará once ventanas en la terminal, cada una de ella ejecutará un nodo.
+
+A continuación se tendrán que inicializar desde la terminal todos los elementos que forman parte del sistema.
+1. En Users database [u_db]: ``` MXConfig.init_db_users ```
+2. En Messages database [m_db]: ``` MXConfig.init_db_message ```
+3. En Message Service 2 [s_m2]: ``` MXConfig.init_sv_message ```
+4. En Message Service 1 [s_m1]: ``` MXConfig.init_sv_message ```
+5. En User Service 1 [s_u1]: ``` MXConfig.init_sv_user ```
+6. En Message Load Balancer 2 [lb_m2]: ``` MXConfig.init_lb_message ```
+7. En Message Load Balancer 1 [lb_m1]: ``` MXConfig.init_lb_message ```
+8. En User Load Balancer 1 [lb_u1]: ``` MXConfig.init_lb_users ```
+9. En Directory [dir]: ``` MXConfig.init_dir ```
+10. En Client 2 [c_2]: ``` Ui.init_ui(:"dir@[your IP]") ```
+11. En Client 1 [c_2]: ``` Ui.init_ui(:"dir@[your IP]") ```
+
+Comando ``` help ```  en la UI para ver las funcionalidades disponibles.
+
+Resultado de la ejecución de las funciones anteriores:
+
+                        +------------+       +------------+
+                        |  CLIENT 1  |       |  CLIENT 2  |
+                        +------------+       +------------+
+                              |                    |
+                              |                    |
+                              |                    |
+                              |                    |
+                              |                    |
+                          +-----------------------------+
+                          |          DIRECTORY          |
+                          |-----------------------------|
+                          |   NM LB USR  |  NM LB MSS   |
+                          +-----------------------------+
+                             /               \          \
+                            /                 \          \
+                           /                   \          \
+                          /                     \          \
+                +------------+      +------------+    +------------+
+                |  LB USR 1  |      |  LB MSS 1  |    |  LB MSS 2  |
+                |------------|      |------------|    |------------|
+                | NM SER USR |      | NM SER MSS |    | NM SER MSS |
+                +------------+      +------------+    +------------+
+               /                      /     \         /   \
+              /                      /       \       /     \
+             /                      /       __\_____|       \
+            |                      |       |   \             |
+            |                      |       |    \_______     |
+            |                      |       |            |    |
+           +-----------+          +-----------+       +-----------+
+           | SER USR 1 |          | SER MSS 1 |       | SER MSS 2 |
+           |-----------|          |-----------|       |-----------|
+           |  NM DB M  | \        |  NM DB M  |       |  NM DB M  |
+           |-----------|  \       +-----------+       +-----------+
+           |  NM DB U  |   \                |           |
+           +-----------+    \               |           |
+                 |           \              |           |
+                 |            \_________    |           |
+                 |                      |   |           |
+                 |                      |   |           |
+           +-----------+               +-------------------+
+           |  DB USR   |               |       DB MSS      |
+           +-----------+               +-------------------+
