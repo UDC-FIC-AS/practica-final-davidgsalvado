@@ -1,0 +1,92 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+Person_Ext(personAlias, "Cliente", "Quiere hacer uso del sistema de mensajes")
+
+Container_Boundary(servidor, "Servidor") {
+    Component(directorio, "Directorio", "Es el directorio encargado de publicar el API a los clientes y redirigir las peticiones a los servicios correspondientes")
+    Component(nodo, "Node manager", "Se encarga de la gestión de los nodos servidores y guarda información sobre ellos")
+   
+       
+}
+
+Container_Boundary(bd1, "Base de datos de usuarios") {
+ ComponentDb(user_db, "Base de datos", "Se encarga de mantener la persistencia de los datos sobre usuarios")
+}
+
+Container_Boundary(bd2, "Base de datos de mensajes") {
+ ComponentDb(message_db, "Base de datos", "Se encarga de mantener la persistencia de los datos sobre mensajes")
+}
+
+Container_Boundary(servidor1, "Servidor de mensajes") {
+    Component(mensajes, "Servicio de mensajes", "Recibe peticiones relacionadas con la gestión de mensajes de la app, las procesa y devuelve una respuesta")
+
+}
+
+Container_Boundary(servidor2, "Servidor de usuarios") {
+    Component(usuarios, "Servicio de usuarios", "Recibe peticiones relacionadas con la gestión de usuarios de la app, las procesa y devuelve una respuesta")
+
+}
+
+
+Container_Boundary(balanceador1, "Balanceador de carga") {
+ Component(bal1, "Balanceador de carga de usuarios", "Se encarga de distribuír las peticiones a los diferentes servidores")
+
+}
+
+
+Container_Boundary(balanceador2, "Balanceador de carga") {
+ Component(bal2, "Balanceador de carga de mensajes", "Se encarga de distribuír las peticiones a los diferentes servidores")
+
+} 
+
+
+
+
+
+
+
+
+
+
+
+Rel(personAlias, directorio, "Envía", "Petición")
+Rel(directorio, personAlias, "Devuelve", "Respuesta")
+
+Rel(bal2, directorio, "Responde", "Resultado")
+Rel(directorio, bal2, "Redirige", "Petición")
+
+
+Rel(nodo, bal1, "Responde", "Resultado")
+
+Rel(bal2, nodo, "Envia", "Petición")
+
+Rel(nodo, bal2, "Responde", "Resultado")
+
+
+Rel(bal1, nodo, "Envia", "Petición")
+
+
+
+
+Rel(bal1, directorio, "Responde", "Resultado")
+Rel(directorio, bal1, "Redirige", "Petición")
+
+Rel(directorio, nodo, "Envía", "Petición")s
+Rel(nodo, directorio, "Responde", "Respuesta")
+
+
+Rel(mensajes, user_db, "Envía", "Petición")
+Rel(user_db, mensajes, "Devuelve", "Respuesta")
+
+Rel(usuarios, message_db, "Envía", "Petición")
+Rel(message_db, usuarios, "Devuelve", "Respuesta")
+
+
+
+Rel(bal1, usuarios, "Responde", "Resultado")
+Rel(usuarios, bal1, "Redirige", "Petición")
+
+Rel(bal2, mensajes, "Responde", "Resultado")
+Rel(mensajes, bal2, "Redirige", "Petición")
+@enduml
