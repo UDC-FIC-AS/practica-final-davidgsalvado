@@ -10,28 +10,54 @@ defmodule MXConfig do
 
   def init_sv_user do
     UserService.init_user_service
-    UserService.add_user_db(:"u_db1@192.168.80.2")
-    UserService.add_message_db(:"m_db1@192.168.80.2")
+<<<<<<< HEAD
+    UserService.add_user_db(:"u_db1@***")
+    UserService.add_message_db(:"m_db1@***")
+=======
+    UserService.add_user_db(:"u_db@***")
+    UserService.add_message_db(:"m_db@***")
+>>>>>>> adolfo&sebas_2
   end
 
   def init_sv_message do
     MessageService.init_message_service
-    MessageService.add_db(:"m_db1@192.168.80.2")
+<<<<<<< HEAD
+    MessageService.add_db(:"m_db1@***")
+=======
+    MessageService.add_db(:"m_db@***")
+>>>>>>> adolfo&sebas_2
   end
 
   def init_lb_users do
     LoadBalancer.init(:user_lbs)
-    LoadBalancer.add_service(:user_lbs, :"s_u1@192.168.80.2")
+<<<<<<< HEAD
+    LoadBalancer.add_service(:user_lbs, :"s_u1@***")
+=======
+    LoadBalancer.add_service(:user_lbs, :"s_u1@***")
+>>>>>>> adolfo&sebas_2
   end
 
   def init_lb_message do
     LoadBalancer.init(:message_lbs)
-    LoadBalancer.add_service(:message_lbs, :"s_m1@192.168.80.2")
+<<<<<<< HEAD
+    LoadBalancer.add_service(:message_lbs, :"s_m1@***")
+    LoadBalancer.add_service(:message_lbs, :"s_m2@***")
+=======
+    LoadBalancer.add_service(:message_lbs, :"s_m1@***")
+    LoadBalancer.add_service(:message_lbs, :"s_m2@***")
+>>>>>>> adolfo&sebas_2
   end
 
   def init_dir do
     Directory.init()
-    Directory.add(:user_lbs, :"lb_u1@192.168.80.2")
-    Directory.add(:message_lbs, :"lb_m1@192.168.80.2")
+<<<<<<< HEAD
+    Directory.add(:user_lbs, :"lb_u1@***")
+    Directory.add(:message_lbs, :"lb_m1@***")
+    Directory.add(:message_lbs, :"lb_m2@***")
+=======
+    Directory.add(:user_lbs, :"lb_u1@***")
+    Directory.add(:message_lbs, :"lb_m1@***")
+    Directory.add(:message_lbs, :"lb_m2@***")
+>>>>>>> adolfo&sebas_2
   end
 end

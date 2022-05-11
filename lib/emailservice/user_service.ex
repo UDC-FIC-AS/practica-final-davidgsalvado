@@ -24,12 +24,15 @@ defmodule UserService do
     end
   end
 
-  def execute_action({:register, {username, password}}, dir_rec_pid) do
+  defp execute_action({:register, {username, password}}, dir_rec_pid) do
+    ConnectionManager.check_db_connection(:user_db)
     resp = ServerDb.read({:global, :user_db}, username)
 
     case resp do
       {:error, :not_found} ->
+        ConnectionManager.check_db_connection(:user_db)
         ServerDb.write({:global, :user_db}, username, password)
+        ConnectionManager.check_db_connection(:message_db)
         ServerDb.write({:global, :message_db}, username, [])
         send(dir_rec_pid, {:ok, {:register, :registered_succesfully}})
 
@@ -37,7 +40,8 @@ defmodule UserService do
     end
   end
 
-  def execute_action({:login, {username, password}}, dir_rec_pid) do
+  defp execute_action({:login, {username, password}}, dir_rec_pid) do
+    ConnectionManager.check_db_connection(:user_db)
     resp = ServerDb.read({:global, :user_db}, username)
 
     case resp do
@@ -52,7 +56,8 @@ defmodule UserService do
     end
   end
 
-  def execute_action({:list_users, _}, dir_rec_pid) do
+  defp execute_action({:list_users, _}, dir_rec_pid) do
+    ConnectionManager.check_db_connection(:user_db)
     resp = ServerDb.get_all_content({:global, :user_db})
     name_list = filter_names(resp, [])
     send(dir_rec_pid, {:ok, {:list_users, name_list}})
@@ -61,6 +66,15 @@ defmodule UserService do
   defp filter_names([], name_list), do: name_list
   defp filter_names([{username, _} | t], name_list) do
     filter_names(t, [username | name_list])
+  end
+
+  defp check_db_connection(db_name) do
+    db_node = NodeManager.get(db_name)
+    has_connection = Node.connect(db_node)
+    case has_connection do
+      true -> :ok
+      false -> raise "db_connection_error"
+    end
   end
 
 end

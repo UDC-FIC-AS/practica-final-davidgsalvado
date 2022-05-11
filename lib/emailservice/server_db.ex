@@ -4,23 +4,23 @@ defmodule ServerDb do
 #==========================[SERVER DB FUNCTIONS]===============================#
   def init_db(db_name) do
     GenServer.start_link(ServerDb, Db.new(),
-    name: {:global, db_name}, timeout: :infinity)
+    name: {:global, db_name}, timeout: 10000)
   end
 
   def write(db_name, key, element) do
-    GenServer.call(db_name, {:write, {key, element}}, :infinity)
+    GenServer.call(db_name, {:write, {key, element}}, 10000)
   end
 
   def overwrite(db_name, key, element) do
-    GenServer.call(db_name, {:overwrite, {key, element}}, :infinity)
+    GenServer.call(db_name, {:overwrite, {key, element}}, 10000)
   end
 
   def read(db_name, key) do
-    GenServer.call(db_name, {:read, key}, :infinity)
+    GenServer.call(db_name, {:read, key}, 10000)
   end
 
   def get_all_content(db_name) do
-    GenServer.call(db_name, :get_all_content, :infinity)
+    GenServer.call(db_name, :get_all_content, 10000)
   end
 
 #==========================[SERVER DB CALLBACKS]===============================#

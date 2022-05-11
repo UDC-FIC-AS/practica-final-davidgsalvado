@@ -19,7 +19,8 @@ defmodule MessageService do
     end
   end
 
-  def execute_action({:send_message, {{sender, recipient}, message}}, dir_rec_pid) do
+  defp execute_action({:send_message, {{sender, recipient}, message}}, dir_rec_pid) do
+    ConnectionManager.check_db_connection(:message_db)
     resp_read = ServerDb.read({:global, :message_db}, recipient)
 
     case resp_read do
@@ -27,13 +28,15 @@ defmodule MessageService do
         send(dir_rec_pid, {:error, {:send_message, :user_does_not_exist}})
       {:ok, message_list} ->
         new_message_list = [{sender, {message, false}} | message_list]
+        ConnectionManager.check_db_connection(:message_db)
         ServerDb.overwrite({:global, :message_db}, recipient, new_message_list)
         send(dir_rec_pid, {:ok, {:send_message, :messsage_sent_succesfully}})
     end
 
   end
 
-  def execute_action({:read_unseen, username}, dir_rec_pid) do
+  defp execute_action({:read_unseen, username}, dir_rec_pid) do
+    ConnectionManager.check_db_connection(:message_db)
     resp_read = ServerDb.read({:global, :message_db}, username)
 
     case resp_read do
@@ -41,13 +44,15 @@ defmodule MessageService do
         send(dir_rec_pid, {:error, {:read_unseen, :user_does_not_exist}})
       {:ok, message_list} ->
         {marked_m_l, unseen_m_l, _} = mark_and_get(message_list, [], [], [])
+        ConnectionManager.check_db_connection(:message_db)
         ServerDb.overwrite({:global, :message_db}, username, marked_m_l)
         send(dir_rec_pid, {:ok, {:read_unseen, unseen_m_l}})
     end
 
   end
 
-  def execute_action({:read_all, username}, dir_rec_pid) do
+  defp execute_action({:read_all, username}, dir_rec_pid) do
+    ConnectionManager.check_db_connection(:message_db)
     resp_read = ServerDb.read({:global, :message_db}, username)
 
     case resp_read do
@@ -55,13 +60,15 @@ defmodule MessageService do
         send(dir_rec_pid, {:error, {:read_all, :user_does_not_exist}})
       {:ok, message_list} ->
         {marked_m_l, _, all_m_l} = mark_and_get(message_list, [], [], [])
+        ConnectionManager.check_db_connection(:message_db)
         ServerDb.overwrite({:global, :message_db}, username, marked_m_l)
         send(dir_rec_pid, {:ok, {:read_all, all_m_l}})
     end
 
   end
 
-  def execute_action({:delete_seen, username}, dir_rec_pid) do
+  defp execute_action({:delete_seen, username}, dir_rec_pid) do
+    ConnectionManager.check_db_connection(:message_db)
     resp_read = ServerDb.read({:global, :message_db}, username)
 
     case resp_read do
@@ -69,6 +76,7 @@ defmodule MessageService do
         send(dir_rec_pid, {:error, {:delete_seen, :user_does_not_exist}})
       {:ok, message_list} ->
         unseen_db_m_l = delete_seen(message_list, [])
+        ConnectionManager.check_db_connection(:message_db)
         ServerDb.overwrite({:global, :message_db}, username, unseen_db_m_l)
         send(dir_rec_pid, {:ok, {:delete_seen, :deleted_succesfully}})
     end

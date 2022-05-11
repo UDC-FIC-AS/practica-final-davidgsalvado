@@ -23,8 +23,9 @@ defmodule LoadBalancer do
       end
   end
 
-  def process_action(sv_type, {action, args}, dir_rec_pid) do
+  defp process_action(sv_type, {action, args}, dir_rec_pid) do
     sv_node = NodeManager.get(sv_type)
+    ConnectionManager.check_node_connection(sv_node)
     service_rec_pid = Node.spawn_link(sv_node,
     fn ->
       case sv_type do

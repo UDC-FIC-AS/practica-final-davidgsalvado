@@ -7,7 +7,7 @@ defmodule Client do
 
   def send_request(dir_node, request, true) do
     rec_pid = spawn(fn -> Ui.receive_response(dir_node) end)
-    send_request_aux(dir_node, request, rec_pid)
+    send_request_aux(dir_node, request, rec_pid) #TODO poner en try do
     :ok
   end
 
@@ -17,7 +17,7 @@ defmodule Client do
     :ok
   end
 
-  def send_request_aux(dir_node, request, rec_pid) do
+  defp send_request_aux(dir_node, request, rec_pid) do
     dir_pid = Node.spawn_link(dir_node,
       fn ->
         Directory.receive_request(rec_pid)
@@ -26,10 +26,10 @@ defmodule Client do
     send(dir_pid, request)
   end
 
-  def receive_response() do
+  defp receive_response() do
     receive do
       {:ok, resp} -> IO.inspect resp
-      {:error, error} -> IO.puts "#{error}"
+      {:error, error} -> IO.inspect error
     end
   end
 
