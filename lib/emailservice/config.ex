@@ -11,8 +11,8 @@ defmodule MXConfig do
   def init_sv_user do
     UserService.init_user_service
 <<<<<<< HEAD
-    UserService.add_user_db(:"u_db1@***")
-    UserService.add_message_db(:"m_db1@***")
+    UserService.add_user_db(:"u_db@***")
+    UserService.add_message_db(:"m_db@***")
 =======
     UserService.add_user_db(:"u_db@***")
     UserService.add_message_db(:"m_db@***")
@@ -22,7 +22,7 @@ defmodule MXConfig do
   def init_sv_message do
     MessageService.init_message_service
 <<<<<<< HEAD
-    MessageService.add_db(:"m_db1@***")
+    MessageService.add_db(:"m_db@***")
 =======
     MessageService.add_db(:"m_db@***")
 >>>>>>> adolfo&sebas_2
