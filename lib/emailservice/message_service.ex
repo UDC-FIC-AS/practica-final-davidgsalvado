@@ -13,7 +13,7 @@ defmodule MessageService do
       {action, args} ->
         try do
           execute_action({action, args}, dir_rec_pid)
-        rescue
+        catch
           _ -> send(dir_rec_pid, {:error, :db_connection_error})
         end
     end

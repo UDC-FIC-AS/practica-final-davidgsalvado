@@ -18,7 +18,7 @@ defmodule Directory do
       {lb_type, action} ->
         try do
           distribute(client_rec_pid, {lb_type, action})
-        rescue
+        catch
           _ -> send(client_rec_pid, {:error, :load_balancer_connection_error})
         end
     end

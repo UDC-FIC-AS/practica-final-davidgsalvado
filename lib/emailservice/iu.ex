@@ -2,13 +2,12 @@ defmodule Ui do
 
   use Agent
 
-  #Lanzar nodo cliente y ejecutar Ui.init_ui(:"dir@[IP]")
-
-  def init_ui(dir_node) do
-    conx = Client.init(dir_node)
+  def init_ui(dir_ip) do
+    conx = Client.init(dir_ip)
     case conx do
       {:ok, dir_node} ->
         Agent.start_link(fn -> "" end, name: :username, timeout: :infinity)
+        Agent.start_link(fn -> 1 end, name: :is_in, timeout: :infinity)
         prompt_1(dir_node)
       {:error, :connection_error} -> Prompt.display("connection error : try again later")
     end
@@ -140,8 +139,10 @@ defmodule Ui do
   def receive_response(dir_node) do
     receive do
       {:ok, {:register, :registered_succesfully}} ->
+        Agent.update(:is_in, fn _ -> 2 end)
         display_aux(dir_node, "registered succesfully! :)", 2)
       {:ok, {:login, :correct_password}} ->
+        Agent.update(:is_in, fn _ -> 2 end)
         display_aux(dir_node, "welcome!", 2)
       {:error, :user_already_registered} ->
         display_aux(dir_node, "username already taken :(", 1)
@@ -171,7 +172,8 @@ defmodule Ui do
       {:ok, {:delete_seen, :deleted_succesfully}} ->
         display_aux(dir_node, "Read messages deleted successfully", 2)
       {:error, _} ->
-        display_aux(dir_node, "connection error : try again later", 1)
+        is_in = Agent.get(:is_in, fn state -> state end)
+        display_aux(dir_node, "connection error : try again later", is_in)
     end
   end
 

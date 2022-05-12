@@ -18,7 +18,7 @@ defmodule UserService do
       {action, args} ->
         try do
           execute_action({action, args}, dir_rec_pid)
-        rescue
+        catch
           _ -> send(dir_rec_pid, {:error, :db_connection_error})
         end
     end
@@ -66,15 +66,6 @@ defmodule UserService do
   defp filter_names([], name_list), do: name_list
   defp filter_names([{username, _} | t], name_list) do
     filter_names(t, [username | name_list])
-  end
-
-  defp check_db_connection(db_name) do
-    db_node = NodeManager.get(db_name)
-    has_connection = Node.connect(db_node)
-    case has_connection do
-      true -> :ok
-      false -> raise "db_connection_error"
-    end
   end
 
 end

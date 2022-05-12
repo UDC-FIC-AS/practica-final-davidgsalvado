@@ -4,7 +4,7 @@ defmodule ConnectionManager do
     has_connection = Node.connect(db_node)
     case has_connection do
       true -> :ok
-      false -> raise "db_connection_error"
+      false -> throw {"db_connection_error", db_node}
     end
   end
 
@@ -12,7 +12,7 @@ defmodule ConnectionManager do
     has_connection = Node.connect(node)
     case has_connection do
       true -> :ok
-      false -> raise "node_connection_error"
+      false -> throw {"node_connection_error", node}
     end
   end
 end

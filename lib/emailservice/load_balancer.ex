@@ -17,7 +17,7 @@ defmodule LoadBalancer do
       {lb_type, {action, args}} ->
         try do
           process_action(lb_type, {action, args}, dir_rec_pid)
-        rescue
+        catch
           _ -> send(dir_rec_pid, {:error, :service_connection_error})
         end
       end
