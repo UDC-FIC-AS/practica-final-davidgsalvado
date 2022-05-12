@@ -18,7 +18,7 @@ defmodule Client do
     :ok
   end
 
-  defp send_request_aux(dir_node, request, rec_pid) do
+  def send_request_aux(dir_node, request, rec_pid) do
     dir_pid = Node.spawn_link(dir_node,
       fn ->
         Directory.receive_request(rec_pid)

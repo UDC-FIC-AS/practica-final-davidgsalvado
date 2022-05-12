@@ -44,6 +44,6 @@ defmodule NodeManager do
   defp aux_get([]), do: {[], []}
   defp aux_get([node | node_list]) do
     {node, node_list ++ [node]}
- end
+  end
 
 end

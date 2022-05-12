@@ -34,15 +34,15 @@ defmodule MXConfig do
   end
 
 
-  defp init_db_users(u_db_node) do
+  def init_db_users(u_db_node) do
     Node.spawn(u_db_node, fn -> ServerDb.init_db(:user_db) end)
   end
 
-  defp init_db_message(m_db_node)do
+  def init_db_message(m_db_node)do
     Node.spawn(m_db_node, fn -> ServerDb.init_db(:message_db) end)
   end
 
-  defp init_sv_user(s_u_node, u_db_node, m_db_node) do
+  def init_sv_user(s_u_node, u_db_node, m_db_node) do
     Node.spawn(s_u_node,
     fn ->
       UserService.init_user_service
@@ -51,7 +51,7 @@ defmodule MXConfig do
     end)
   end
 
-  defp init_sv_message(s_m_node, m_db_node) do
+  def init_sv_message(s_m_node, m_db_node) do
     Node.spawn(s_m_node,
     fn ->
       MessageService.init_message_service
@@ -59,7 +59,7 @@ defmodule MXConfig do
     end)
   end
 
-  defp init_lb_users(lb_u_node, s_u_node) do
+  def init_lb_users(lb_u_node, s_u_node) do
     Node.spawn(lb_u_node,
     fn ->
       LoadBalancer.init(:user_lbs)
@@ -67,7 +67,7 @@ defmodule MXConfig do
     end)
   end
 
-  defp init_lb_message(lb_m_node, s_m1_node, s_m2_node) do
+  def init_lb_message(lb_m_node, s_m1_node, s_m2_node) do
     Node.spawn(lb_m_node,
     fn ->
       LoadBalancer.init(:message_lbs)
@@ -76,7 +76,7 @@ defmodule MXConfig do
     end)
   end
 
-  defp init_dir(dir_node, lb_u1_node, lb_m1_node, lb_m2_node) do
+  def init_dir(dir_node, lb_u1_node, lb_m1_node, lb_m2_node) do
     Node.spawn(dir_node,
     fn ->
       Directory.init()
