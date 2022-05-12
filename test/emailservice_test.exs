@@ -8,7 +8,7 @@ defmodule EmailserviceTest do
 
     Client.init(ip)
 
-    Process.sleep(1000) # damos tiempo a los nodos para configurarse
+    Process.sleep(3000) # damos tiempo a los nodos para configurarse
 
     # Node.spawn(:"u_db@192.168.80.2", fn -> MXConfig.init_db_users() end)
     # Node.spawn(:"m_db@192.168.80.2", fn -> MXConfig.init_db_message() end)
