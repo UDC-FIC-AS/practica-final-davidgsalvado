@@ -2,10 +2,8 @@ defmodule Ui do
 
   use Agent
 
-  #Lanzar nodo cliente y ejecutar Ui.init_ui(:"dir@[IP]")
-
-  def init_ui(dir_node) do
-    conx = Client.init(dir_node)
+  def init_ui(dir_ip) do
+    conx = Client.init(dir_ip)
     case conx do
       {:ok, dir_node} ->
         Agent.start_link(fn -> "" end, name: :username, timeout: :infinity)

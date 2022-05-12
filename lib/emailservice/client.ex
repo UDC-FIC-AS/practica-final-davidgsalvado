@@ -1,6 +1,7 @@
 defmodule Client do
 
-  def init(dir_node) do
+  def init(dir_ip) do
+    dir_node = Utilities.get_node("dir", dir_ip)
     if Node.connect(dir_node) do {:ok, dir_node}
     else {:error, :connection_error} end
   end
