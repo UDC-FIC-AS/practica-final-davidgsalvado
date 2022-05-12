@@ -1,26 +1,14 @@
 defmodule EmailserviceTest do
   use ExUnit.Case
 
-  defp get_node(node_name, ip) do
-    [node_name, "@", ip] |> Enum.join("") |> String.to_atom
-  end
-
-  defp get_nodes() do
-    ip = "192.168.80.2" # sustituir por tu IP (IMPORTANTE)
-
-    node_names = ["dir", "lb_u1", "lb_m1", "s_u1",
-    "s_m1", "u_db", "m_db"]
-
-    Enum.map(node_names, fn node_name -> get_node(node_name, ip) end)
-  end
-
   setup do
+    # IMPORTANTE: LOS NODOS SE TIENEN QUE ARRANCAR A MANO PARA QUE EL TEST LOS PUEDA CONFIGURAR.
+    ip = "192.168.80.2"
+    MXConfig.init_config(ip) # SUSTITUIR IP PARA CONFIGURAR LOS NODOS
 
-    nodes = get_nodes()
+    Client.init(ip)
 
-    Enum.map(nodes, fn node -> Node.connect(node) end) # nos conectamos a los nodos
-
-    Client.init(List.first(nodes))
+    Process.sleep(1000) # damos tiempo a los nodos para configurarse
 
     # Node.spawn(:"u_db@192.168.80.2", fn -> MXConfig.init_db_users() end)
     # Node.spawn(:"m_db@192.168.80.2", fn -> MXConfig.init_db_message() end)
@@ -34,28 +22,81 @@ defmodule EmailserviceTest do
   end
 
   test "integration of all the system" do
-    nodes = get_nodes()
+    nodes = Node.list()
 
+    #***************************************** SERVICIO DE USUARIOS ***************************************************************
+    # - REGISTRO DE USUARIOS
     Client.send_request_aux(List.first(nodes), {:user_lbs, {:register, {"David", "password"}}}, self()) # registro con usuario no existente
+    assert_receive {:ok, {:register, :registered_succesfully}}, 10000
+
+    Client.send_request_aux(List.first(nodes), {:user_lbs, {:register, {"Adrian", "password"}}}, self()) # registro con usuario no existente
     assert_receive {:ok, {:register, :registered_succesfully}}, 10000
 
     Client.send_request_aux(List.first(nodes), {:user_lbs, {:register, {"David", "password"}}}, self()) # registro de usuario ya registrado
     assert_receive {:error, :user_already_registered}, 10000
 
-    Client.send_request_aux(List.first(nodes), {:user_lbs, {:login,  {"David", "password"}}}, self()) # login de usuario registrado
+    # - LOGIN DE USUARIOS
+    Client.send_request_aux(List.first(nodes), {:user_lbs, {:login, {"David", "password"}}}, self()) # login de usuario registrado
     assert_receive {:ok, {:login, :correct_password}}, 10000
 
     Client.send_request_aux(List.first(nodes), {:user_lbs, {:login,  {"David", "incorrect_password"}}}, self()) # login de contraseña incorrecta
     assert_receive {:error, :wrong_password}, 10000
 
-    Client.send_request_aux(List.first(nodes), {:user_lbs, {:login,  {"Adrián", "password"}}}, self()) # login con usuario no registrado
+    Client.send_request_aux(List.first(nodes), {:user_lbs, {:login,  {"Mar", "password"}}}, self()) # login con usuario no registrado
     assert_receive {:error, :user_does_not_exist}, 10000
 
+    # - LISTAR USUARIOS REGISTRADOS
     Client.send_request_aux(List.first(nodes), {:user_lbs, {:list_users, ""}}, self())
-    assert_receive {:list_users, ["David"]}, 10000
+    assert_receive {:ok, {:list_users, ["David", "Adrian"]}}, 10000
 
-    Client.send_request_aux(List.first(nodes), {:message_lbs, {:send, {"David", ?}}}, self())
-    assert_receive {:send_message, :message_sent_succesfully}, 10000
+    #***************************************** SERVICIO DE MENSAJES ***************************************************************
+    # - ENVIAR MENSAJES
+    Client.send_request_aux(List.first(nodes), {:message_lbs, {:send_message, {{"Adrian","David"}, "Hola"}}}, self()) # mensaje nuevo
+    assert_receive {:ok, {:send_message, :messsage_sent_succesfully}}, 10000
 
+    Client.send_request_aux(List.first(nodes), {:message_lbs, {:send_message, {{"David","Mar"}, "Hola"}}}, self()) # mensaje a usuario no existente
+    assert_receive {:error, {:send_message, :user_does_not_exist}}, 10000
+
+    # - LEER MENSAJES NO LEÍDOS (los lee y los marca como leídos)
+    Client.send_request_aux(List.first(nodes), {:message_lbs, {:read_unseen, "David"}}, self()) # usuario registrado con mensajes
+    assert_receive {:ok, {:read_unseen, [{"Adrian", "Hola"}]}}, 10000
+
+    Client.send_request_aux(List.first(nodes), {:message_lbs, {:read_unseen, "Adrian"}}, self()) # usuario registrado sin mensajes
+    assert_receive {:ok, {:read_unseen, []}}, 10000
+
+    Client.send_request_aux(List.first(nodes), {:message_lbs, {:read_unseen, "Mar"}}, self()) # usuario no registrado
+    assert_receive {:error, {:read_unseen, :user_does_not_exist}}, 10000
+
+    # - EJEMPLO DE FUNCIONALIDAD (Parte 1: se añade otro mensaje para tener un mensaje leido y otro no leidos en el buzón)
+    Client.send_request_aux(List.first(nodes), {:message_lbs, {:send_message, {{"Adrian","David"}, "Buenas tardes!"}}}, self())
+    assert_receive {:ok, {:send_message, :messsage_sent_succesfully}}, 10000
+
+    # - LEER TODOS LOS MENSAJES (leidos y NO leidos y los marca como leidos si no lo están)
+    Client.send_request_aux(List.first(nodes), {:message_lbs, {:read_all, "David"}}, self()) # usuario registrado
+    assert_receive {:ok, {:read_all, [{"Adrian", "Hola"}, {"Adrian", "Buenas tardes!"}]}}, 10000
+
+    Client.send_request_aux(List.first(nodes), {:message_lbs, {:read_all, "Mar"}}, self()) # usuario no registrado
+    assert_receive {:error, {:read_all, :user_does_not_exist}}, 10000
+
+    # - BORRAR MENSAJES LEIDOS
+    Client.send_request_aux(List.first(nodes), {:message_lbs, {:delete_seen, "Mar"}}, self()) # usuario no registrado
+    assert_receive {:error, {:delete_seen, :user_does_not_exist}}, 10000
+
+
+    # - EJEMPLO DE FUNCIONALIDAD (Parte 2: se leen los no leidos y leidos antes y después de borrar los leidos)
+    Client.send_request_aux(List.first(nodes), {:message_lbs, {:read_unseen, "David"}}, self())
+    assert_receive {:ok, {:read_unseen, []}}, 10000
+
+    Client.send_request_aux(List.first(nodes), {:message_lbs, {:read_all, "David"}}, self())
+    assert_receive {:ok, {:read_all, [{"Adrian", "Hola"}, {"Adrian", "Buenas tardes!"}]}}, 10000
+
+    Client.send_request_aux(List.first(nodes), {:message_lbs, {:delete_seen, "David"}}, self())
+    assert_receive {:ok, {:delete_seen, :deleted_succesfully}}, 10000
+
+    Client.send_request_aux(List.first(nodes), {:message_lbs, {:read_unseen, "David"}}, self())
+    assert_receive {:ok, {:read_unseen, []}}, 10000
+
+    Client.send_request_aux(List.first(nodes), {:message_lbs, {:read_all, "David"}}, self())
+    assert_receive {:ok, {:read_all, []}}, 10000
   end
 end
