@@ -9,32 +9,36 @@
 
 # Breve presentación del proyecto
 
-Principalmente la descripción de la propuesta, y cualquier otro
-aspecto destacable como presentación del proyecto.
+En este proyecto hemos implementado un servicio de mail basado en una arquitectura cliente servidor 
+distribuida. Esto significa que tanto el servidor como el cliente se encuentran en nodos diferentes.
+El sistema permite registrarse, loguearse, enviar mensajes a los usuarios registrados,
+listar los mensajes nuevos, listar el histórico de mensajes, borrar los mensajes leídos y listar los
+usuarios registrados.
 
 
 # Install
 
-Primero se tendrá que editar el fichero **config.ex** en **lib/emailservice**, sustituyendo todos los *** por
-la ip correspondiente.
-
 Se ejecuta  ``` ./script.sh [your IP] ``` desde **practica-final-davidgsalvado**.
-Este script generará once ventanas en la terminal, cada una de ella ejecutará un nodo.
+Este script generará una serie de ventanas en la terminal, cada una de ellas ejecutará un nodo.
 
-A continuación se tendrán que inicializar desde la terminal todos los elementos que forman parte del sistema.
-1. En Users database [u_db]: ``` MXConfig.init_db_users ```
-2. En Messages database [m_db]: ``` MXConfig.init_db_message ```
-3. En Message Service 2 [s_m2]: ``` MXConfig.init_sv_message ```
-4. En Message Service 1 [s_m1]: ``` MXConfig.init_sv_message ```
-5. En User Service 1 [s_u1]: ``` MXConfig.init_sv_user ```
-6. En Message Load Balancer 2 [lb_m2]: ``` MXConfig.init_lb_message ```
-7. En Message Load Balancer 1 [lb_m1]: ``` MXConfig.init_lb_message ```
-8. En User Load Balancer 1 [lb_u1]: ``` MXConfig.init_lb_users ```
-9. En Directory [dir]: ``` MXConfig.init_dir ```
-10. En Client 2 [c_2]: ``` Ui.init_ui(:"dir@[your IP]") ```
-11. En Client 1 [c_2]: ``` Ui.init_ui(:"dir@[your IP]") ```
+>Es importante destacar que el script solo funciona para sistemas UNIX que empleen GNOME como sistema de ventanas. En caso de no contar con un sistema de estas características, será
+necesario inicializar estos nodos en diferentes ventanas manualmente.
+>Tip: Copiar los comandos del script.
 
-Comando ``` help ```  en la UI para ver las funcionalidades disponibles.
+- Una vez desplegados los nodos aparecerá un nodo especial con el nombre de ```config@[your IP]```.
+- En la terminal interactiva del nodo escribir el comando ```MXConfig.init_config("[your IP]")```. 
+>Es importante pasar ```your IP``` como un ```string```.
+
+- Una vez hecho esto, todos los nodos estarán configurados siguiendo la estructura del diagrama que aparece abajo.
+
+- Ahora, pasar a una de las ventanas que alojan cualquiera de los nodos cliente ```c_1@[your IP]```, por ejemplo.
+
+- Ejecutar el comando ```Ui.init_ui("[your IP]")``` en la terminal interactiva.
+>Es importante pasar ```your IP``` como un ```string```.
+
+- Se iniciará la interfaz por línea de comandos. Con el comando ```register [your_name] [your_password] te podrás registrar y acceder al sistema.
+
+- Una vez registrado o logueado, escribir comando ``` help ```  en la UI para ver las funcionalidades disponibles.
 
 Resultado de la ejecución de las funciones anteriores:
 
