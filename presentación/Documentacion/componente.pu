@@ -4,10 +4,11 @@
 Person_Ext(personAlias, "Cliente", "Quiere hacer uso del sistema de mensajes")
 
 Container_Boundary(servidor, "Servidor") {
-    Component(directorio, "Directorio", "Es el directorio encargado de publicar el API a los clientes y redirigir las peticiones a los servicios correspondientes")
     Component(nodo1, "Node manager mensajes", "Se encarga de la gestión de los nodos de los balanceadores de carga y guarda información sobre ellos")
     Component(nodo2, "Node manager usuarios", "Se encarga de la gestión de los nodos de los balanceadores de carga y guarda información sobre ellos")
-   
+    Component(directorio, "Directorio", "Es el directorio encargado de publicar el API a los clientes y redirigir las peticiones a los servicios correspondientes"){
+            Component(connection_manager1, "Connection manager", "Se asegura que los nodos a los que vaya a acceder sean accesibles")
+    }
        
 }
 
@@ -27,25 +28,34 @@ Container_Boundary(bd2, "Base de datos de mensajes") {
 }
 
 Container_Boundary(servidor1, "Servidor de mensajes") {
-    Component(mensajes, "Servicio de mensajes", "Recibe peticiones relacionadas con la gestión de mensajes de la app, las procesa y devuelve una respuesta")
+    Component(mensajes, "Servicio de mensajes", "Recibe peticiones relacionadas con la gestión de mensajes de la app, las procesa y devuelve una respuesta"){
+        Component(connection_manager2, "Connection manager", "Se asegura que los nodos a los que vaya a acceder sean accesibles")
+    }
 
 }
 
 Container_Boundary(servidor2, "Servidor de usuarios") {
-    Component(usuarios, "Servicio de usuarios", "Recibe peticiones relacionadas con la gestión de usuarios de la app, las procesa y devuelve una respuesta")
+    Component(usuarios, "Servicio de usuarios", "Recibe peticiones relacionadas con la gestión de usuarios de la app, las procesa y devuelve una respuesta"){
+        Component(connection_manager3, "Connection manager", "Se asegura que los nodos a los que vaya a acceder sean accesibles")
+
+    }
 
 }
 
 
 Container_Boundary(balanceador1, "Balanceador de carga") {
- Component(bal1, "Balanceador de carga de usuarios", "Se encarga de distribuír las peticiones a los diferentes servidores")
+ Component(bal1, "Balanceador de carga de usuarios", "Se encarga de distribuír las peticiones a los diferentes servidores"){
+     Component(connection_manager4, "Connection manager", "Se asegura que los nodos a los que vaya a acceder sean accesibles")
+ }
 
 
 }
 
 
 Container_Boundary(balanceador2, "Balanceador de carga") {
- Component(bal2, "Balanceador de carga de mensajes", "Se encarga de distribuír las peticiones a los diferentes servidores")
+ Component(bal2, "Balanceador de carga de mensajes", "Se encarga de distribuír las peticiones a los diferentes servidores"){
+    Component(connection_manager5, "Connection manager", "Se asegura que los nodos a los que vaya a acceder sean accesibles")    
+ }
 } 
 
 
