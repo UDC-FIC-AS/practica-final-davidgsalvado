@@ -24,3 +24,6 @@ emailservice-*.tar
 
 # Temporary files, for example, from tests.
 /tmp/
+
+#.lock files
+*.lock
