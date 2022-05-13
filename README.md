@@ -34,9 +34,9 @@ necesario inicializar estos nodos en diferentes ventanas manualmente.
 - Ahora, pasar a una de las ventanas que alojan cualquiera de los nodos cliente ```c_1@[your IP]```, por ejemplo.
 
 - Ejecutar el comando ```Ui.init_ui("[your IP]")``` en la terminal interactiva.
->Es importante pasar ```your IP``` como un ```string```.
+>Es importante pasar ```[your IP]``` como un ```string```.
 
-- Se iniciará la interfaz por línea de comandos. Con el comando ```register [your_name] [your_password] te podrás registrar y acceder al sistema.
+- Se iniciará la interfaz por línea de comandos. Con el comando ```register [your_name] [your_password]``` te podrás registrar y acceder al sistema.
 
 - Una vez registrado o logueado, escribir comando ``` help ```  en la UI para ver las funcionalidades disponibles.
 
