@@ -3,12 +3,12 @@ defmodule EmailserviceTest do
 
   setup do
     # IMPORTANTE: LOS NODOS SE TIENEN QUE ARRANCAR A MANO PARA QUE EL TEST LOS PUEDA CONFIGURAR.
-    ip = "192.168.80.2"
+    ip = "192.168.1.135"
     MXConfig.init_config(ip) # SUSTITUIR IP PARA CONFIGURAR LOS NODOS
 
     Client.init(ip)
 
-    Process.sleep(3000) # damos tiempo a los nodos para configurarse
+    Process.sleep(10_000) # damos tiempo a los nodos para configurarse
 
     # Node.spawn(:"u_db@192.168.80.2", fn -> MXConfig.init_db_users() end)
     # Node.spawn(:"m_db@192.168.80.2", fn -> MXConfig.init_db_message() end)
