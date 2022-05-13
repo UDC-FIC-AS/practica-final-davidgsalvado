@@ -1,12 +1,35 @@
 defmodule Db do
+
+  @moduledoc """
+  Módulo que se encarga de implementar las funcionalidades de las BDs.
+
+  """
+
+  @doc """
+  Devuelve una BD vacia.
+
+  """
+  @spec new() :: list()
   def new do
     []
   end
 
-  #write
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  @doc """
+  Inserta una tupla ({key, element}) al principio de la BD.
+
+  """
+  @spec write(list(), term(), term()) :: list()
   def write(db_ref, key, element), do: [{key, element} | db_ref]
 
-  #delete
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  @doc """
+  Elimina una tupla referenciada por key de la BD.
+
+  """
+  @spec delete(list(), term()) :: list()
   def delete(db_ref, key), do: aux_delete(db_ref, key, [], false)
 
   defp aux_delete([], _, new_db_ref, _), do: new_db_ref
@@ -23,34 +46,31 @@ defmodule Db do
     aux_delete(t, key, [{k, v} | new_db_ref], false)
   end
 
-  #overwrite
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  @doc """
+  Sobrescribe una tupla en la BD
+
+  """
+  @spec overwrite(list(), term(), term()) :: list()
   def overwrite(db_ref, key, element) do
     new_db_ref = delete(db_ref, key)
     write(new_db_ref, key, element)
   end
 
-  #read
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  @doc """
+  Devuelve el elemento referenciado por key. En caso de no encontrarlo devuelve
+  un error.
+
+  """
+  @spec read(list(), term()) :: list() | {:error, :not_found}
   def read([], _), do: {:error, :not_found}
 
   def read([{k, v} | _], key) when k == key, do: {:ok, v}
 
   def read([{_, _} | t], key), do: read(t, key)
 
-  #match
-  def match(db_ref, element), do: aux_match([], db_ref, element)
-
-  defp aux_match(l_keys, [], _), do: l_keys
-
-  defp aux_match(l_keys, [{k, v} | t], element) when v == element do
-    aux_match([k | l_keys], t, element)
-  end
-
-  defp aux_match(l_keys, [{_, _} | t], element) do
-    aux_match(l_keys, t, element)
-  end
-
-  def destroy(_) do
-    :ok
-  end
 
 end

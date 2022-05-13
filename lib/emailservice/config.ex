@@ -1,5 +1,25 @@
 defmodule MXConfig do
 
+  @moduledoc """
+  Este módulo se encarga de inicializar una configuración particular del sistema
+  implementado.
+
+  En concreto prepara:
+  - Un directorio
+  - Un balanceador de carga de usuarios.
+  - Dos balanceadores de carga de mensajes.
+  - Un servicio de usuarios.
+  - Dos servicios de mensajes.
+  - La base de datos de usuarios.
+  - La base de datos de mensajes.
+  """
+
+  @doc """
+  inicializa la configuración tomando la como parametro la IP local del ordenador
+  en el que se ejecuta.
+
+  """
+  @spec init_config(term()) :: term()
   def init_config(ip) do
     node_names = ["dir", "lb_u1", "lb_m1", "lb_m2", "s_u1", "s_m1", "s_m2",
     "u_db", "m_db"]

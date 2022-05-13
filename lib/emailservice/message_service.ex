@@ -1,13 +1,49 @@
 defmodule MessageService do
 
+  @moduledoc """
+  Módulo que implementa el servicio de mensajes.
+
+  Este módulo tiene como finalidad recibir las peticiones asignadas por los
+  balanceadores de carga, resolverlas y devolver la respuesta al directorio.
+
+  Atiende los siguientes tipos de peticiones:
+    - send_message
+    - read_unseen
+    - read_all
+    - delete_seen
+  """
+
+  @doc """
+  Inicializa el NodeManager en el que se guarda el nodo que referencia a la
+  base de datos de mensajes.
+
+  """
+  @spec init_message_service() :: :ok
   def init_message_service do
     NodeManager.init(:message_db)
   end
 
+  @doc """
+  Añade un nodo de base de datos a la lista correspondiente. Únicamnete se debe
+  agregar un nodo.
+
+  ## Parámetros
+    - db_node : Nodo a agregar.
+  """
+  @spec add_db(node()) :: {:ok, node()} | {:error, :connection_error}
   def add_db(db_node) do
     NodeManager.add(:message_db, db_node)
   end
 
+
+  @doc """
+  Recibe una petición del balanceador de carga, la resuleve y envia la respuesta
+  al directorio.
+
+  ## Parámetros
+    - dir_rec_pid : Pid al que se tiene que enviar la respuesta.
+  """
+  @spec receive_request(pid()) :: term()
   def receive_request(dir_rec_pid) do
     receive do
       {action, args} ->
