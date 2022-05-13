@@ -84,3 +84,7 @@ Resultado de la ejecución de las funciones anteriores:
            +-----------+               +-------------------+
            |  DB USR   |               |       DB MSS      |
            +-----------+               +-------------------+
+
+- Para ejecutar los tests habrá lanzar ``` ./script.sh [your IP] ``` desde **practica-final-davidgsalvado**.
+- Una vez ejecutado el script desde **practica-final-davidgsalvado** se ejecutará en la terminal el comando ```iex --name test@[your IP] -S mix test```.
+> Es importante lanzar los tests como un nodo para que puedan realizarse contra el sistema distribuido desplegado con el script.
