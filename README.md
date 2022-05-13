@@ -89,7 +89,7 @@ Resultado de la ejecución de las funciones anteriores:
 
 - Antes de lanzar los test será necesario cambiar la IP en test/emailservice_test.exs
 - Para ejecutar los tests habrá que lanzar ``` ./script.sh [your IP] ``` desde **practica-final-davidgsalvado**.
-- Una vez ejecutado el script desde **practica-final-davidgsalvado** se ejecutará en la terminal el comando ```iex --name test@[your IP] -S mix test```.
+- Una vez ejecutado el script desde **practica-final-davidgsalvado** se ejecutará en la terminal el comando ```iex --name test@[your IP] --cookie a_cookie -S mix test```.
 > Es importante lanzar los tests como un nodo para que puedan realizarse contra el sistema distribuido desplegado con el script.
 
 # Estructura del repositorio
