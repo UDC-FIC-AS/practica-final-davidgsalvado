@@ -18,9 +18,9 @@ usuarios registrados.
 
 # Install
 
-Primero ejecutar ```mix deps.get```
+Primero ejecutar ```mix deps.get``` y luego ```mix compile``` desde **practica-final-davidgsalvado**.
 
-Después se ejecuta  ``` ./script.sh [your IP] ``` desde **practica-final-davidgsalvado**.
+Después se ejecuta  ``` ./script.sh [your IP] ``` 
 Este script generará una serie de ventanas en la terminal, cada una de ellas ejecutará un nodo.
 
 >Es importante destacar que el script solo funciona para sistemas UNIX que empleen GNOME como sistema de ventanas. En caso de 
